@@ -3,14 +3,16 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from app.forms import CityForm
+from app.models import City
 from django.views import View
+
 
 def weather(request):
     weather_data = None
     if request.method == 'POST':
         form = CityForm(request.POST)
         if form.is_valid():
-            city = form.cleaned_data['city']
+            city = form.cleaned_data['city'].strip().lower()
             weather_api_key = settings.ENV.WEATHER_API_KEY
             weather_api_url = settings.ENV.WEATHER_API_URL
             params = {
@@ -42,7 +44,9 @@ def weather(request):
                 weather_data = {'error': 'Невозможно получить данные о погоде.'}
     else:
         form = CityForm(
-            initial={'city': request.session.get('last_city', None)}
+            initial={
+                'city': request.session.get('last_city', None).title()
+                if request.session.get('last_city', None) else ''}
         )
 
     return render(request, 'weather/weather.html', {'form': form, 'weather_data': weather_data})
@@ -53,13 +57,8 @@ def viewed_cities(request):
 
 
 class CityAutocomplete(View):
-   def get(self, request):
-       query = request.GET.get('term', '')
-       cities = self.get_cities(query)
-       return JsonResponse(cities, safe=False)
-
-   def get_cities(self, query):
-
-       all_cities = ['Moscow', 'New York', 'London', 'Paris', 'Tokyo']
-       filtered_cities = [city for city in all_cities if query.lower() in city.lower()]
-       return filtered_cities
+    def get(self, request):
+        query = request.GET.get('term', '')
+        cities = set(City.objects.filter(name__istartswith=query.lower()).values_list('name', flat=True))
+        cities = [city.split('(')[0] for city in cities]  # убираем из названий инфо о регионе
+        return JsonResponse(cities, safe=False)
