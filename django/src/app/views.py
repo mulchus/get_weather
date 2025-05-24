@@ -24,6 +24,7 @@ def weather(request):
                     params=params,
                 )
                 response.raise_for_status()
+
                 weather_data = response.json()
                 if not 'cities' in request.session:
                     request.session['cities'] = {}
@@ -34,10 +35,14 @@ def weather(request):
                     request.session['cities'][city] += 1
                     request.session.modified = True
 
+                request.session['last_city'] = city
+
             except requests.exceptions.HTTPError:
                 weather_data = {'error': 'Невозможно получить данные о погоде.'}
     else:
-        form = CityForm()
+        form = CityForm(
+            initial={'city': request.session.get('last_city', None)}
+        )
 
     return render(request, 'weather/weather.html', {'form': form, 'weather_data': weather_data})
 
