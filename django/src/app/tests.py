@@ -10,23 +10,23 @@ class WeatherViewTests(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_index_view_get(self):
-        response = self.client.get(reverse('index'))
+    def test_weather_view_get(self):
+        response = self.client.get(reverse('weather'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'weather/index.html')
+        self.assertTemplateUsed(response, 'weather/weather.html')
         self.assertContains(response, 'Введите название города')
 
-    def test_index_view_post_valid_city(self):
-        response = self.client.post(reverse('index'), {'city': 'Moscow'})
+    def test_weather_view_post_valid_city(self):
+        response = self.client.post(reverse('weather'), {'city': 'Moscow'})
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'weather/index.html')
+        self.assertTemplateUsed(response, 'weather/weather.html')
         self.assertIn('weather_data', response.context)
         self.assertNotIn('error', response.context['weather_data'])
 
-    def test_index_view_post_invalid_city(self):
-        response = self.client.post(reverse('index'), {'city': 'InvalidCity'})
+    def test_weather_view_post_invalid_city(self):
+        response = self.client.post(reverse('weather'), {'city': 'InvalidCity'})
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'weather/index.html')
+        self.assertTemplateUsed(response, 'weather/weather.html')
         self.assertIn('weather_data', response.context)
         self.assertIn('error', response.context['weather_data'])
 
@@ -56,7 +56,7 @@ class WeatherAPITests(TestCase):
             "wind": {"speed": 2}
         }
 
-        response = self.client.post(reverse('index'), {'city': 'Moscow'})
+        response = self.client.post(reverse('weather'), {'city': 'Moscow'})
         self.assertEqual(response.status_code, 200)
         self.assertIn('weather_data', response.context)
         self.assertEqual(response.context['weather_data']['name'], 'Moscow')

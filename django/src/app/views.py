@@ -1,9 +1,10 @@
 import requests
 from django.conf import settings
+from django.http import JsonResponse
 from django.shortcuts import render
-from .forms import CityForm
+from app.forms import CityForm
 
-def index(request):
+def weather(request):
     weather_data = None
     if request.method == 'POST':
         form = CityForm(request.POST)
@@ -17,16 +18,29 @@ def index(request):
                 'units': 'metric',
                 'lang': 'ru',
             }
-            response = requests.get(
-                weather_api_url,
-                params=params,
-            )
-            if response.status_code == 200:
+            try:
+                response = requests.get(
+                    weather_api_url,
+                    params=params,
+                )
+                response.raise_for_status()
                 weather_data = response.json()
-            else:
-                print(response.__dict__)
+                if not 'cities' in request.session:
+                    request.session['cities'] = {}
+                if not city in request.session['cities']:
+                    request.session['cities'].update({city: 1})
+                    request.session.modified = True
+                else:
+                    request.session['cities'][city] += 1
+                    request.session.modified = True
+
+            except requests.exceptions.HTTPError:
                 weather_data = {'error': 'Невозможно получить данные о погоде.'}
     else:
         form = CityForm()
 
-    return render(request, 'weather/index.html', {'form': form, 'weather_data': weather_data})
+    return render(request, 'weather/weather.html', {'form': form, 'weather_data': weather_data})
+
+
+def viewed_cities(request):
+    return JsonResponse(request.session.get('cities', {}))
