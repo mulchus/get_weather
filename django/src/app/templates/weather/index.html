@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,7 +9,7 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-          background-image: url('https://get.wallhere.com/photo/sunlight-trees-landscape-grass-sky-field-clouds-Sun-horizon-cloud-grassland-meadow-plain-lawn-prairie-meteorological-phenomenon-cumulus-165684.jpg');
+          background-image: url('{% static 'background.jpg' %}');
           background-repeat: no-repeat;
           background-attachment: fixed;
           background-size: 100% 100%;
