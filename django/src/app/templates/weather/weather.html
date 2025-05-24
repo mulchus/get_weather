@@ -7,6 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Прогноз погоды</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
+
     <style>
         body {
           background-image: url('{% static 'background.jpg' %}');
@@ -14,18 +19,14 @@
           background-attachment: fixed;
           background-size: 100% 100%;
         }
-        .form-group label {
-            font-weight: bold;
-            display: inherit;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <h1 class="text-center mb-4">Погода в городе</h1>
+                <h1 class="text-center mb-4" style="color: #ac0818">Погода в городе</h1>
+
                 <form method="post" class="mb-4">
                     {% csrf_token %}
                     <div class="form-group">
@@ -36,7 +37,7 @@
                 </form>
 
                 {% if weather_data %}
-                    <div class="card" style="background-color: #76ccf1;">
+                    <div class="card" style="color: #ac0818; background-color: #76ccf1;">
                         <div class="card-body">
                             {% if weather_data.error %}
                                 <p class="text-danger">{{ weather_data.error }}</p>
@@ -56,8 +57,29 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#city_input").autocomplete({
+               source: function(request, response) {
+                   $.ajax({
+                       url: "{% url 'city_autocomplete' %}",
+                       dataType: "json",
+                       data: {
+                           term: request.term
+                       },
+                       success: function(data) {
+                           response(data);
+                           console.log(data);
+                       }
+                   });
+               },
+               minLength: 2
+            });
+        });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>

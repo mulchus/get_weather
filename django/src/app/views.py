@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from app.forms import CityForm
+from django.views import View
 
 def weather(request):
     weather_data = None
@@ -49,3 +50,16 @@ def weather(request):
 
 def viewed_cities(request):
     return JsonResponse(request.session.get('cities', {}))
+
+
+class CityAutocomplete(View):
+   def get(self, request):
+       query = request.GET.get('term', '')
+       cities = self.get_cities(query)
+       return JsonResponse(cities, safe=False)
+
+   def get_cities(self, query):
+
+       all_cities = ['Moscow', 'New York', 'London', 'Paris', 'Tokyo']
+       filtered_cities = [city for city in all_cities if query.lower() in city.lower()]
+       return filtered_cities
