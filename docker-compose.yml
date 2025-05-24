@@ -1,0 +1,56 @@
+x-django-service-environment: &django-service-environment
+  SITE_ROOT_URL: http://127.0.0.1:8000
+  DJ_DEBUG: 'true'
+  DJ_SECRET_KEY: ')x0c@_&2&okn27=g&=nc&-fs)^&b(8eq0xnhlss+s2rf1e2icy'
+  GUNICORN_CMD_ARGS: '--reload --workers 1'
+  DJ_ALLOWED_HOSTS: '["127.0.0.1", "localhost", "django"]'
+  DJ_CSRF_TRUSTED_ORIGINS: '["http://127.0.0.1:8000"]'
+  WEATHER_API_KEY: ${WEATHER_API_KEY}
+
+x-django-service-volumes: &django-service-volumes
+  volumes:
+    - ./django:/app/
+    - ./django/pyproject.toml:/app/pyproject.toml
+    - ./django/poetry.lock:/app/poetry.lock
+    - nginx_assets:/var/www/nginx_static
+    - nginx_media:/var/www/media
+
+
+services:
+
+  django:
+    image: get_weather:latest
+    build:
+      context: ./django
+    environment:
+      <<: *django-service-environment
+    <<: *django-service-volumes
+
+  django-static-copyer:
+    environment:
+      <<: *django-service-environment
+    <<: *django-service-volumes
+    image: get_weather:latest
+    command:
+      - sh
+      - -c
+      - |
+        python3 manage.py collectstatic --noinput && \
+        echo 'Copying static' && \
+        cp -r /var/www/collected_static/. /var/www/nginx_static/
+
+  nginx:
+    image: nginx:1.23.3
+    ports:
+      - 127.0.0.1:8000:80
+    volumes:
+      - ./nginx-templates:/etc/nginx/templates/
+      - nginx_assets:/var/www/assets/
+      - nginx_media:/var/www/media/
+    depends_on:
+      django:
+        condition: service_started
+
+volumes:
+  nginx_assets:
+  nginx_media:

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Прогноз погоды</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+          background-image: url('https://get.wallhere.com/photo/sunlight-trees-landscape-grass-sky-field-clouds-Sun-horizon-cloud-grassland-meadow-plain-lawn-prairie-meteorological-phenomenon-cumulus-165684.jpg');
+          background-repeat: no-repeat;
+          background-attachment: fixed;
+          background-size: 100% 100%;
+        }
+        .form-group label {
+            font-weight: bold;
+            display: inherit;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h1 class="text-center mb-4">Погода в городе</h1>
+                <form method="post" class="mb-4">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form.city.label_tag }}
+                        {{ form.city }}
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Узнать погоду</button>
+                </form>
+
+                {% if weather_data %}
+                    <div class="card" style="background-color: #76ccf1;">
+                        <div class="card-body">
+                            {% if weather_data.error %}
+                                <p class="text-danger">{{ weather_data.error }}</p>
+                            {% else %}
+                                <h2 class="card-title">{{ weather_data.name }}</h2>
+                                <p class="card-text">Температура: {{ weather_data.main.temp }}°C</p>
+                                <p class="card-text">Погода: {{ weather_data.weather.0.description }}</p>
+                                <p class="card-text">Скорость ветра: {{ weather_data.wind.speed }} м/с</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "get_weather"
+version = "0.1.0"
+description = ""
+authors = ["mulchus <mulch@list.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Django = "^5.2"
+django-cors-headers = "3.7.0"
+gunicorn = "==21.*"
+pydantic = "^2.11"
+pydantic-settings = "^2.9"
+pytest = "^8.3"
+pytest-django = "^4.11"
+requests = "^2.32"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
