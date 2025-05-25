@@ -16,6 +16,12 @@
 git clone https://github.com/mulchus/get_weather.git
 ```
 
+Перейдите в папку с проектом:
+```shell
+cd get_weather
+```
+
+
 ### Переменные окружения
 
 Часть настроек проекта берётся из переменных окружения.  
@@ -24,7 +30,7 @@ git clone https://github.com/mulchus/get_weather.git
 
 ### Запуск
 
-Перейдите в папку с проектом и выполните команду сборки и запуска проекта:
+Выполните команду сборки и запуска проекта:
 
 ```shell
 $ bash deploy.sh
